@@ -1,6 +1,6 @@
 package main
 
-import "github.com/sparkster/autoloader/server"
+import "github.com/spark-plus/autoloader/server"
 
 func main() {
 	server.GinServer()

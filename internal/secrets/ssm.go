@@ -9,7 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
-	"github.com/sparkster/autoloader/internal/connections"
+	"github.com/spark-plus/autoloader/internal/connections"
 )
 
 type Ssmsm struct {

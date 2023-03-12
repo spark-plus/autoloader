@@ -1,4 +1,4 @@
-module github.com/sparkster/autoloader
+module github.com/spark-plus/autoloader
 
 go 1.19
 

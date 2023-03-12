@@ -3,7 +3,7 @@ package secrets
 import (
 	"context"
 
-	"github.com/sparkster/autoloader/internal/connections"
+	"github.com/spark-plus/autoloader/internal/connections"
 )
 
 type SecretManager interface {

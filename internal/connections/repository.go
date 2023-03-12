@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sparkster/autoloader/internal/databases"
+	"github.com/spark-plus/autoloader/internal/databases"
 )
 
 // ConnectionRepository is a repository for managing connections in RDBMS

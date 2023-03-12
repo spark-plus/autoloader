@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/sparkster/autoloader/internal/connections"
+	"github.com/spark-plus/autoloader/internal/connections"
 )
 
 type ConnectionService struct {

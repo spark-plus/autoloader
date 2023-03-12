@@ -5,7 +5,7 @@ import (
 
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
-	"github.com/sparkster/autoloader/server/routes"
+	"github.com/spark-plus/autoloader/server/routes"
 )
 
 func GinServer() {
