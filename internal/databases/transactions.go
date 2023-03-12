@@ -8,13 +8,13 @@ type Tx interface {
 }
 
 type ConnectionTx struct {
-	Session *xorm.Session
+	session *xorm.Session
 }
 
 func (t *ConnectionTx) Commit() error {
-	return t.Session.Commit()
+	return t.session.Commit()
 }
 
 func (t *ConnectionTx) Rollback() error {
-	return t.Session.Rollback()
+	return t.session.Rollback()
 }

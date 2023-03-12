@@ -5,7 +5,6 @@ import (
 	"fmt"
 
 	"github.com/sparkster/autoloader/internal/databases"
-	"xorm.io/xorm"
 )
 
 // ConnectionRepository is a repository for managing connections in RDBMS
@@ -18,6 +17,14 @@ func NewConnectionRepository(db *databases.DBSession) *ConnectionRepository {
 	return &ConnectionRepository{db: db}
 }
 
+func (r *ConnectionRepository) BeginTx(ctx context.Context) (databases.Tx, error) {
+	txn, err := r.db.BeginTx(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return txn, nil
+}
+
 // CreateConnection creates a new connection reference in the RDBMS
 func (r *ConnectionRepository) Create(ctx context.Context, connection *Connection) error {
 	txn, err := r.db.BeginTx(ctx)
@@ -25,7 +32,7 @@ func (r *ConnectionRepository) Create(ctx context.Context, connection *Connectio
 		return err
 	}
 
-	session := txn.(*databases.ConnectionTx).Session
+	session := r.db.GetSession(txn)
 
 	defer session.Close()
 
@@ -41,7 +48,8 @@ func (r *ConnectionRepository) Create(ctx context.Context, connection *Connectio
 	return nil
 }
 
-func (r *ConnectionRepository) CreateWTx(ctx context.Context, session *xorm.Session, connection *Connection) error {
+func (r *ConnectionRepository) CreateWTx(ctx context.Context, connection *Connection, tx databases.Tx) error {
+	session := r.db.GetSession(tx)
 	_, err := session.Insert(connection)
 	if err != nil {
 		return fmt.Errorf("failed to insert connection: %v", err)
@@ -50,7 +58,11 @@ func (r *ConnectionRepository) CreateWTx(ctx context.Context, session *xorm.Sess
 }
 
 // UpdateConnection updates an existing connection reference in the RDBMS
-func (r *ConnectionRepository) UpdateWTx(ctx context.Context, session *xorm.Session, conn *Connection) error {
+func (r *ConnectionRepository) UpdateWTx(ctx context.Context, conn *Connection, tx databases.Tx) error {
+	session := r.db.GetSession(tx)
+	if conn.ID == 0 {
+		return fmt.Errorf("cannot update non existent Id: %d", conn.ID)
+	}
 	if _, err := session.ID(conn.ID).Update(conn); err != nil {
 		return fmt.Errorf("failed to update connection: %v", err)
 	}
@@ -58,7 +70,8 @@ func (r *ConnectionRepository) UpdateWTx(ctx context.Context, session *xorm.Sess
 }
 
 // DeleteConnection deletes an existing connection reference in the RDBMS
-func (r *ConnectionRepository) DeleteWT(ctx context.Context, session *xorm.Session, conn *Connection) error {
+func (r *ConnectionRepository) DeleteWT(ctx context.Context, conn *Connection, tx databases.Tx) error {
+	session := r.db.GetSession(tx)
 	if _, err := session.ID(conn.ID).Delete(conn); err != nil {
 		return fmt.Errorf("failed to delete connection: %v", err)
 	}
@@ -67,13 +80,8 @@ func (r *ConnectionRepository) DeleteWT(ctx context.Context, session *xorm.Sessi
 
 // GetConnectionByID returns the connection reference with the given ID
 func (r *ConnectionRepository) GetByID(ctx context.Context, id int64) (*Connection, error) {
-	txn, err := r.db.BeginTx(ctx)
-	if err != nil {
-		return nil, err
-	}
+	session := r.db.NewSession(ctx)
 	conn := &Connection{}
-
-	session := txn.(*databases.ConnectionTx).Session
 
 	has, err := session.ID(id).Get(conn)
 
@@ -90,13 +98,8 @@ func (r *ConnectionRepository) GetByID(ctx context.Context, id int64) (*Connecti
 
 // GetConnectionByID returns the connection reference with the given ID
 func (r *ConnectionRepository) GetByConnectionId(ctx context.Context, id string) (*Connection, error) {
-	txn, err := r.db.BeginTx(ctx)
-	if err != nil {
-		return nil, err
-	}
+	session := r.db.NewSession(ctx)
 	conn := &Connection{}
-
-	session := txn.(*databases.ConnectionTx).Session
 
 	has, err := session.Where("connection_id = ?", id).Get(conn)
 
