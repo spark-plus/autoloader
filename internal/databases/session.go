@@ -10,6 +10,10 @@ type DBSession struct {
 	engine *xorm.Engine
 }
 
+func NewDBSession(engine *xorm.Engine) *DBSession {
+	return &DBSession{engine: engine}
+}
+
 func (r *DBSession) BeginTx(ctx context.Context) (Tx, error) {
 	session := r.engine.NewSession()
 	err := session.Begin()

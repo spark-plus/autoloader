@@ -6,22 +6,22 @@ import (
 )
 
 type ConnectionData struct {
-	Description string    `xorm:"description"`
-	Host        string    `xorm:"host"`
-	Port        int       `xorm:"port"`
-	Schema      string    `xorm:"schema"`
-	Login       string    `xorm:"login"`
-	Password    string    `xorm:"password"`
-	Extra       string    `xorm:"extra"`
-	CreatedAt   time.Time `xorm:"created_at"`
-	UpdatedAt   time.Time `xorm:"updated_at"`
+	Description string    `json:"description"`
+	Host        string    `json:"host"`
+	Port        int       `json:"port"`
+	Schema      string    `json:"schema"`
+	Login       string    `json:"login"`
+	Password    string    `json:"password"`
+	Extra       string    `json:"extra"`
+	CreatedAt   time.Time `json:"created_at"`
+	UpdatedAt   time.Time `json:"updated_at"`
 }
 
 type Connection struct {
 	ID             int64          `xorm:"'id' pk autoincr"`
 	ConnectionID   string         `xorm:"connection_id"`
 	ConnectionType ConnectionType `xorm:"connection_type"`
-	ConnectionRef  ConnectionRef  `xorm:"json 'connection_type'"`
+	ConnectionRef  ConnectionRef  `xorm:"json 'connection_ref'"`
 	Description    string         `xorm:"description"`
 	CreatedAt      time.Time      `xorm:"created_at"`
 	UpdatedAt      time.Time      `xorm:"updated_at"`
