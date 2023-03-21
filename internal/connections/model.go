@@ -27,6 +27,17 @@ type Connection struct {
 	UpdatedAt      time.Time      `xorm:"updated_at"`
 }
 
+func NewConnection(connId string, connType ConnectionType, connRef ConnectionRef, desc string) *Connection {
+	return &Connection{
+		ConnectionID:   connId,
+		ConnectionType: connType,
+		ConnectionRef:  connRef,
+		Description:    desc,
+		CreatedAt:      time.Now(),
+		UpdatedAt:      time.Now(),
+	}
+}
+
 type ConnectionRef struct {
 	Location     LocationType `json:"location_type"`
 	LocationPath string       `json:"location_path"`

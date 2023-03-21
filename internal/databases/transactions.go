@@ -1,20 +1,41 @@
 package databases
 
-import "xorm.io/xorm"
+import (
+	"context"
+
+	"xorm.io/xorm"
+)
 
 type Tx interface {
-	Commit() error
-	Rollback() error
+	DoTransaction(ctx context.Context, fn func(session *xorm.Session) error) error
+	NewSession() *xorm.Session
 }
 
-type ConnectionTx struct {
-	session *xorm.Session
+type transactionManager struct {
+	engine *xorm.Engine
 }
 
-func (t *ConnectionTx) Commit() error {
-	return t.session.Commit()
+func NewTransactionManager(engine *xorm.Engine) Tx {
+	return &transactionManager{engine: engine}
 }
 
-func (t *ConnectionTx) Rollback() error {
-	return t.session.Rollback()
+func (tm *transactionManager) DoTransaction(ctx context.Context, fn func(session *xorm.Session) error) error {
+	session := tm.engine.NewSession()
+	defer session.Close()
+
+	if err := session.Begin(); err != nil {
+		return err
+	}
+
+	if err := fn(session); err != nil {
+		session.Rollback()
+		return err
+	}
+
+	return session.Commit()
+}
+
+func (tm *transactionManager) NewSession() *xorm.Session {
+	session := tm.engine.NewSession()
+	return session
 }
